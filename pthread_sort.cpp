@@ -15,16 +15,17 @@
 
 #define THREAD_COUNT 4
 
-float *arr; 
+float *arr;
+int n; 
   
-void merge(int l, int m, int r, num_of_elements) 
+void merge(int l, int m, int r) 
 {   
   int lsize = m - l + 1;
   int rsize = r - m;
   int i, j, k;
 
-  float *left_subarray = new float[num_of_elements/2];
-  float *right_subarray = new float[num_of_elements/2];
+  float *left_subarray = new float[n/2];
+  float *right_subarray = new float[n/2];
 
   for (i = 0; i < lsize; i++)
   {
@@ -84,8 +85,8 @@ void* merge_sort_parallel(void* arg)
   int thread_part = part;
   part++; 
 
-  int l = thread_part * (num_of_elements / THREAD_COUNT); 
-  int r = (thread_part + 1) * (num_of_elements / THREAD_COUNT) - 1; 
+  int l = thread_part * (n / THREAD_COUNT); 
+  int r = (thread_part + 1) * (n / THREAD_COUNT) - 1; 
 
   int m = l + (r - l) / 2; 
   if (l < r) { 
@@ -99,6 +100,7 @@ void* merge_sort_parallel(void* arg)
 int pthread_sort(int num_of_elements, float *data)
 { 
 
+  n = num_of_elements;
   arr = data;
 
   pthread_t threads[THREAD_COUNT]; 
@@ -113,9 +115,9 @@ int pthread_sort(int num_of_elements, float *data)
     pthread_join(threads[i], NULL);
   } 
    
-  merge(0, (num_of_elements / 2 - 1) / 2, num_of_elements / 2 - 1); 
-  merge(num_of_elements / 2, num_of_elements/2 + (num_of_elements-1-num_of_elements/2)/2, num_of_elements - 1); 
-  merge(0, (num_of_elements - 1)/2, num_of_elements - 1); 
+  merge(0, (n / 2 - 1) / 2, n / 2 - 1); 
+  merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
+  merge(0, (n - 1)/2, n - 1); 
 
   return 0; 
 
