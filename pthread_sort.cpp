@@ -17,6 +17,7 @@
 
 float *arr;
 int n; 
+int part = 0;
   
 void merge(int l, int m, int r) 
 {   
