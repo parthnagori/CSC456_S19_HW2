@@ -106,7 +106,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   printf("Inside pthread \n");
 
-  int mem_size = numElements * sizeof(float); 
+  int mem_size = num_of_elements * sizeof(float); 
   arr = (float *)malloc(mem_size);
   
   for(int i = 0; i < num_of_elements; i++){
