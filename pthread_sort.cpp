@@ -73,7 +73,7 @@ void merge(int l, int m, int r)
 void merge_sort(int l, int r) 
 {  
 
-  printf("Inside merge sort");
+  printf("Inside merge sort \n");
   int m = l + ((r - l) / 2); 
   if (l < r) { 
     merge_sort(l, m); 
@@ -84,7 +84,7 @@ void merge_sort(int l, int r)
    
 void* merge_sort_parallel(void* arg) 
 { 
-  printf("Inside Merge parallel");
+  printf("Inside Merge parallel \n");
 
   int thread_part = part;
   part++; 
@@ -104,11 +104,13 @@ void* merge_sort_parallel(void* arg)
 int pthread_sort(int num_of_elements, float *data)
 { 
 
-  printf("Inside pthread");
+  printf("Inside pthread \n");
 
   for(int i = 0; i < num_of_elements; i++){
     arr[i] = data[i];
   }
+
+  printf("Data copied \n");
 
   n = num_of_elements;
 
