@@ -72,6 +72,8 @@ void merge(int l, int m, int r)
  
 void merge_sort(int l, int r) 
 {  
+
+  printf("Inside merge sort");
   int m = l + ((r - l) / 2); 
   if (l < r) { 
     merge_sort(l, m); 
@@ -82,6 +84,7 @@ void merge_sort(int l, int r)
    
 void* merge_sort_parallel(void* arg) 
 { 
+  printf("Inside Merge parallel");
 
   int thread_part = part;
   part++; 
@@ -101,8 +104,19 @@ void* merge_sort_parallel(void* arg)
 int pthread_sort(int num_of_elements, float *data)
 { 
 
+  printf("Inside pthread");
+
+  for(int i = 0; i < num_of_elements; i++){
+    arr[i] = data[i];
+  }
+
   n = num_of_elements;
-  arr = data;
+
+  // pthread_t p1, p2;
+  // int rc;
+  // printf("main: begin\n");
+  // rc = pthread_create(&p1, NULL, mythread, "A"); assert(rc == 0);
+  // rc = pthread_create(&p2, NULL, mythread, "B"); assert(rc == 0);
 
   pthread_t threads[THREAD_COUNT]; 
  
