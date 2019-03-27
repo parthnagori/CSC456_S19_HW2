@@ -149,7 +149,6 @@ int pthread_sort(int num_of_elements, float *data)
 
   for (int i = 0; i < THREAD_COUNT; i++, low += len) {
     partition = &partitions[i];
-    partition->partition_no = i;
 
     partition->partition_l = low;
     partition->partition_r = low + len - 1;
