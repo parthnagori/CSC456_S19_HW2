@@ -167,7 +167,7 @@ int pthread_sort(int num_of_elements, float *data)
   // creating 2 threads
   for (int i = 0; i < THREAD_COUNT; i++) {
     tsk = &tsklist[i];
-    pthread_create(&threads[i], NULL, merge_sort_parallel, tsk);
+    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) tsk);
   }
 
   // joining all 2 threads
