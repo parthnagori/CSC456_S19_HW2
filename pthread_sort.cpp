@@ -128,7 +128,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   int partition_length = n / THREAD_COUNT;
 
-  printf("THREADS:%d MAX:%d partition_length:%d\n", THREAD_COUNT, n, partition_length);
+  // printf("THREADS:%d MAX:%d partition_length:%d\n", THREAD_COUNT, n, partition_length);
 
   int l = 0;
 
@@ -142,7 +142,7 @@ int pthread_sort(int num_of_elements, float *data)
     partition->left = temp + l;
     partition->right = temp + l + partition_length - 1;
 
-    printf("RANGE %d: %d %d\n", i, partition->l, partition->r);
+    // printf("RANGE %d: %d %d\n", i, partition->l, partition->r);
   }
 
   // creating 2 threads
@@ -159,7 +159,7 @@ int pthread_sort(int num_of_elements, float *data)
   struct partition *first_partition = &partitions[0];
   for (int i = 1; i < THREAD_COUNT; i++) {
     struct partition *partition = &partitions[i];
-    printf("Final Merge RANGE %d: %d %d %d\n", i, first_partition->l, partition->l - 1,  partition->r);
+    // printf("Final Merge RANGE %d: %d %d %d\n", i, first_partition->l, partition->l - 1,  partition->r);
     merge(first_partition->l, partition->l - 1, partition->r, first_partition->left, first_partition->right);
   }
 
