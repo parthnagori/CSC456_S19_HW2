@@ -14,12 +14,11 @@
 #include "mysort.h"
 
 
-#define THREAD_COUNT 8
+#define THREAD_COUNT 2
 
 float *arr;
 int n;
 int part = 0;
-float *temp;
 
 // Struct to pass range and memory information to each thread
 struct partition {
@@ -119,86 +118,41 @@ int pthread_sort(int num_of_elements, float *data)
   arr = data;
   n = num_of_elements;
 
-  temp = (float *)malloc(n * sizeof(float));
+  struct partition* partition1 = (struct partition*) malloc(sizeof(struct partition));
+  struct partition* partition2 = (struct partition*) malloc(sizeof(struct partition));
 
-  struct partition *partition;
-
-  pthread_t threads[THREAD_COUNT];
-  struct partition partitions[THREAD_COUNT];
+  pthread_t p1, p2;
 
   int partition_length = n / THREAD_COUNT;
 
-  // printf("THREADS:%d MAX:%d partition_length:%d\n", THREAD_COUNT, n, partition_length);
-
   int l = 0;
 
-  for (int i = 0; i < THREAD_COUNT; i++, l += partition_length) {
-    partition = &partitions[i];
-    partition->l = l;
-    partition->r = l + partition_length - 1;
-    if (i == (THREAD_COUNT - 1))
-      partition->r = n - 1;
+  // Generating partition values for partitions to be run on both the threads
+  partition1->l = l;
+  partition1->r = l + partition_length - 1;
 
-    partition->left = temp + l;
-    partition->right = temp + l + partition_length - 1;
+  partition2->l = l + partition_length;
+  partition2->r = n - 1;
 
-    // printf("RANGE %d: %d %d\n", i, partition->l, partition->r);
-  }
+  // Allocating a common memory location for each thread
+  partition1->left = (float *)malloc(partition_length * sizeof(float));
+  partition1->right = (float *)malloc(partition_length * sizeof(float)); 
 
-  // creating 2 threads
-  for (int i = 0; i < THREAD_COUNT; i++) {
-    partition = &partitions[i];
-    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
-  }
-
-  // joining all 2 threads
-  for (int i = 0; i < THREAD_COUNT; i++)
-    pthread_join(threads[i], NULL);
-
-
-  struct partition *first_partition = &partitions[0];
-  for (int i = 1; i < THREAD_COUNT; i++) {
-    struct partition *partition = &partitions[i];
-    // printf("Final Merge RANGE %d: %d %d %d\n", i, first_partition->l, partition->l - 1,  partition->r);
-    merge(first_partition->l, partition->l - 1, partition->r, first_partition->left, first_partition->right);
-  }
-
-
-  // struct partition* partition1 = (struct partition*) malloc(sizeof(struct partition));
-  // struct partition* partition2 = (struct partition*) malloc(sizeof(struct partition));
-
-  // pthread_t p1, p2;
-
-  // int partition_length = n / THREAD_COUNT;
-
-  // int l = 0;
-
-  // // Generating partition values for partitions to be run on both the threads
-  // partition1->l = l;
-  // partition1->r = l + partition_length - 1;
-
-  // partition2->l = l + partition_length;
-  // partition2->r = n - 1;
-
-  // // Allocating a common memory location for each thread
-  // partition1->left = (float *)malloc(partition_length * sizeof(float));
-  // partition1->right = (float *)malloc(partition_length * sizeof(float)); 
-
-  // partition2->left = (float *)malloc(partition_length * sizeof(float));
-  // partition2->right = (float *)malloc(partition_length * sizeof(float));   
+  partition2->left = (float *)malloc(partition_length * sizeof(float));
+  partition2->right = (float *)malloc(partition_length * sizeof(float));   
 
 
   
-  // int rc;
-  // rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) partition1); assert(rc == 0);
-  // rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) partition2); assert(rc == 0);
+  int rc;
+  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) partition1); assert(rc == 0);
+  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) partition2); assert(rc == 0);
 
   
-  // pthread_join(p1, NULL);
-  // pthread_join(p2, NULL);
+  pthread_join(p1, NULL);
+  pthread_join(p2, NULL);
 
 
-  // merge(partition1->l, partition2->l - 1, partition2->r, partition1->left, partition1->right);
+  merge(partition1->l, partition2->l - 1, partition2->r, partition1->left, partition1->right);
 
   return 0;
 
