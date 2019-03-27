@@ -120,47 +120,106 @@ void* merge_sort_parallel(void* arg)
 int pthread_sort(int num_of_elements, float *data)
 {
 
-  // printf("Inside pthread \n");
+  printf("Inside pthread \n");
 
   struct partition *partition;
 
   arr = data;
+  // int mem_size = num_of_elements * sizeof(float);
+  // arr = (float *)malloc(mem_size);
 
-  // printf("Data copied \n");
+  // for(int i = 0; i < num_of_elements; i++){
+  //   arr[i] = data[i];
+  // }
+
+  printf("Data copied \n");
 
   n = num_of_elements;
 
-  struct partition *partition1;
-  struct partition *partition2;
 
-  int parition_length = n / THREAD_COUNT;
+  pthread_t threads[THREAD_COUNT];
+  struct partition partitions[THREAD_COUNT];
 
-  printf("THREADS:%d MAX:%d parition_length:%d\n", THREAD_COUNT, n, parition_length);
+  int len = n / THREAD_COUNT;
 
-  
-  int l = 0;
+  printf("THREADS:%d MAX:%d LEN:%d\n", THREAD_COUNT, n, len);
 
-  // Generating partition values for partitions to be run on both the threads
-  partition1->partition_l = l;
-  partition1->partition_r = l + parition_length - 1;
+  int low = 0;
+ 
 
-  partition2->partition_l = l + parition_length;
-  partition2->partition_r = n - 1;
-   
+  for (int i = 0; i < THREAD_COUNT; i++, low += len) {
+    partition = &partitions[i];
+    partition->partition_no = i;
 
-  pthread_t p1, p2;
-  int rc;
-  printf("main: begin\n");
-  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) &partition1); assert(rc == 0);
-  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) &partition2); assert(rc == 0);
-
-  
-  pthread_join(p1, NULL);
-  pthread_join(p2, NULL);
+    partition->partition_low = low;
+    partition->partition_high = low + len - 1;
+    if (i == (THREAD_COUNT - 1))
+      partition->partition_high = n - 1;
 
 
-  merge(partition1->partition_l, partition2->partition_l - 1, partition2->partition_r);
+    printf("RANGE %d: %d %d\n", i, partition->partition_low, partition->partition_high);
+  }
 
+  // creating 2 threads
+  for (int i = 0; i < THREAD_COUNT; i++) {
+    partition = &partitions[i];
+    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
+  }
+
+  // joining all 2 threads
+  for (int i = 0; i < THREAD_COUNT; i++)
+    pthread_join(threads[i], NULL);
+
+  // show the array values for each thread
+
+  // for (int i = 0; i < THREAD_COUNT; i++) {
+  //     partition = &partitions[i];
+  //     printf("SUB %d:", partition->partition_no);
+  //     for (int j = partition->partition_low; j <= partition->partition_high; ++j)
+  //         printf(" %d", a[j]);
+  //     printf("\n");
+  // }
+
+  // merging the final 4 parts
+
+  struct partition *partitionm = &partitions[0];
+  for (int i = 1; i < THREAD_COUNT; i++) {
+    struct partition *partition = &partitions[i];
+    printf("Final Merge RANGE %d: %d %d %d\n", i, partitionm->partition_low, partition->partition_low - 1,  partition->partition_high);
+    merge(partitionm->partition_low, partition->partition_low - 1, partition->partition_high);
+  }
+
+
+
+
+  // pthread_t p1, p2;
+  // int rc;
+  // printf("main: begin\n");
+  // rc = pthread_create(&p1, NULL, mythread, "A"); assert(rc == 0);
+  // rc = pthread_create(&p2, NULL, mythread, "B"); assert(rc == 0);
+
+  // pthread_t threads[THREAD_COUNT];
+
+  // for (int i = 0; i < THREAD_COUNT; i++)
+  // {
+  //   pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i);
+  // }
+
+  // for (int i = 0; i < THREAD_COUNT; i++)
+  // {
+  //   pthread_join(threads[i], NULL);
+  // }
+
+  // merge(0, (n / 2 - 1) / 2, n / 2 - 1);
+  // merge(n / 2, n/2 + (n-1-n/2)/2, n - 1);
+  // merge(0, (n - 1)/2, n - 1);
+
+
+
+
+  // for(int i = 0; i < n; i++){
+  //   data[i] = arr[i];
+  // }
 
   return 0;
 
