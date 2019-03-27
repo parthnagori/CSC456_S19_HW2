@@ -126,6 +126,8 @@ int pthread_sort(int num_of_elements, float *data)
 
   printf("Inside pthread \n");
 
+  struct tsk *tsk;
+
   arr = data;
   // int mem_size = num_of_elements * sizeof(float); 
   // arr = (float *)malloc(mem_size);
@@ -139,23 +141,23 @@ int pthread_sort(int num_of_elements, float *data)
   n = num_of_elements;
 
 
+  pthread_t threads[THREAD_MAX];
+  struct tsk tsklist[THREAD_COUNT];
 
-  struct tsk tsklist[THREAD_MAX];
-
-  int len = n / THREAD_MAX;
+  int len = n / THREAD_COUNT;
   
-  printf("THREADS:%d MAX:%d LEN:%d\n", THREAD_MAX, n, len);
+  printf("THREADS:%d MAX:%d LEN:%d\n", THREAD_COUNT, n, len);
 
   int low = 0;
 
-  for (int i = 0; i < THREAD_MAX; i++, low += len) {
+  for (int i = 0; i < THREAD_COUNT; i++, low += len) {
     tsk = &tsklist[i];
     tsk->tsk_no = i;
 
     
     tsk->tsk_low = low;
     tsk->tsk_high = low + len - 1;
-    if (i == (THREAD_MAX - 1))
+    if (i == (THREAD_COUNT - 1))
       tsk->tsk_high = MAX - 1;
 
 
@@ -163,18 +165,18 @@ int pthread_sort(int num_of_elements, float *data)
   }
 
   // creating 2 threads
-  for (int i = 0; i < THREAD_MAX; i++) {
+  for (int i = 0; i < THREAD_COUNT; i++) {
     tsk = &tsklist[i];
     pthread_create(&threads[i], NULL, merge_sort_parallel, tsk);
   }
 
   // joining all 2 threads
-  for (int i = 0; i < THREAD_MAX; i++)
+  for (int i = 0; i < THREAD_COUNT; i++)
     pthread_join(threads[i], NULL);
 
   // show the array values for each thread
   
-  // for (int i = 0; i < THREAD_MAX; i++) {
+  // for (int i = 0; i < THREAD_COUNT; i++) {
   //     tsk = &tsklist[i];
   //     printf("SUB %d:", tsk->tsk_no);
   //     for (int j = tsk->tsk_low; j <= tsk->tsk_high; ++j)
@@ -185,7 +187,7 @@ int pthread_sort(int num_of_elements, float *data)
   // merging the final 4 parts
   
   struct tsk *tskm = &tsklist[0];
-  for (int i = 1; i < THREAD_MAX; i++) {
+  for (int i = 1; i < THREAD_COUNT; i++) {
     struct tsk *tsk = &tsklist[i];
     merge(tskm->tsk_low, tsk->tsk_low - 1, tsk->tsk_high);
   }
