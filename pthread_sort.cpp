@@ -10,6 +10,7 @@
 #include <float.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <assert.h>
 #include "mysort.h"
 
 
@@ -99,7 +100,7 @@ void* merge_sort_parallel(void* arg)
 {
   printf("Inside Merge parallel \n");
 
-  struct partition partition = (struct partition)arg;
+  struct partition *partition = (struct partition *)arg;
   int l;
   int r;
 
@@ -129,56 +130,36 @@ int pthread_sort(int num_of_elements, float *data)
 
   n = num_of_elements;
 
-
-  // pthread_t threads[THREAD_COUNT];
-
-  // struct partition partitions[THREAD_COUNT];
-  struct partition partition1;
-  struct partition partition2;
+  struct partition *partition1;
+  struct partition *partition2;
 
   int parition_length = n / THREAD_COUNT;
 
   printf("THREADS:%d MAX:%d parition_length:%d\n", THREAD_COUNT, n, parition_length);
 
+  
   int l = 0;
 
   // Generating partition values for partitions to be run on both the threads
   partition1->partition_l = l;
   partition1->partition_r = l + parition_length - 1;
-  l += parition_length;
-  partition2->partition_l = l;
+
+  partition2->partition_l = l + parition_length;
   partition2->partition_r = n - 1;
    
 
   pthread_t p1, p2;
   int rc;
   printf("main: begin\n");
-  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) partition1); assert(rc == 0);
-  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) partition2); assert(rc == 0);
+  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) &partition1); assert(rc == 0);
+  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) &partition2); assert(rc == 0);
 
-  // creating threads
-  // for (int i = 0; i < THREAD_COUNT; i++) {
-  //   partition = &partitions[i];
-  //   pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
-  // }
-
-  // joining threads
-  // for (int i = 0; i < THREAD_COUNT; i++)
-  //   pthread_join(threads[i], NULL);
+  
   pthread_join(p1, NULL);
   pthread_join(p2, NULL);
 
 
-
   merge(partition1->partition_l, partition2->partition_l - 1, partition2->partition_r);
-
-  // // performing final merge
-  // struct partition *first = &partitions[0];
-  // for (int i = 1; i < THREAD_COUNT; i++) {
-  //   struct partition *partition = &partitions[i];
-  //   printf("Final Merge RANGE %d: %d %d %d\n", i, first->partition_l, partition->partition_l - 1,  partition->partition_r);
-  //   merge(first->partition_l, partition->partition_l - 1, partition->partition_r);
-  // }
 
 
   return 0;
