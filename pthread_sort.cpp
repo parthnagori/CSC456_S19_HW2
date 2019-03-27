@@ -21,6 +21,8 @@ int part = 0;
   
 void merge(int l, int m, int r) 
 {   
+  printf("Inside Merge \n");
+  
   int lsize = m - l + 1;
   int rsize = r - m;
   int i, j, k;
@@ -73,7 +75,7 @@ void merge(int l, int m, int r)
 void merge_sort(int l, int r) 
 {  
 
-  printf("Inside merge sort \n");
+  // printf("Inside merge sort \n");
   int m = l + ((r - l) / 2); 
   if (l < r) { 
     merge_sort(l, m); 
@@ -106,12 +108,13 @@ int pthread_sort(int num_of_elements, float *data)
 
   printf("Inside pthread \n");
 
-  int mem_size = num_of_elements * sizeof(float); 
-  arr = (float *)malloc(mem_size);
+  arr = data;
+  // int mem_size = num_of_elements * sizeof(float); 
+  // arr = (float *)malloc(mem_size);
 
-  for(int i = 0; i < num_of_elements; i++){
-    arr[i] = data[i];
-  }
+  // for(int i = 0; i < num_of_elements; i++){
+  //   arr[i] = data[i];
+  // }
 
   printf("Data copied \n");
 
@@ -139,9 +142,9 @@ int pthread_sort(int num_of_elements, float *data)
   merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
   merge(0, (n - 1)/2, n - 1);
 
-  for(int i = 0; i < n; i++){
-    data[i] = arr[i];
-  } 
+  // for(int i = 0; i < n; i++){
+  //   data[i] = arr[i];
+  // } 
 
   return 0; 
 
