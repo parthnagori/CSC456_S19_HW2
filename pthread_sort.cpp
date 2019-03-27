@@ -1,4 +1,4 @@
-  // CSC456: Name --
+  // CSC456: Name -- 
   // CSC456: Student ID # --
   // CSC456: I am implementing -- {What parallel sorting algorithm using pthread}
   // CSC456: Feel free to modify any of the following. You can only turnin this file.
@@ -16,7 +16,7 @@
 #define THREAD_COUNT 2
 
 float *arr;
-int n;
+int n; 
 int part = 0;
 
 struct tsk {
@@ -25,9 +25,9 @@ struct tsk {
     int tsk_high;
 };
 
-
-void merge(int l, int m, int r)
-{
+  
+void merge(int l, int m, int r) 
+{   
   //printf("Inside Merge Range: %d %d %d\n", l, m, r);
   //printf("Inside Merge \n");
 
@@ -43,63 +43,63 @@ void merge(int l, int m, int r)
 
   for (i = 0; i < lsize; i++)
   {
-    left_subarray[i] = arr[i + l];
+    left_subarray[i] = arr[i + l]; 
   }
 
   for (i = 0; i < rsize; i++)
-  {
-    right_subarray[i] = arr[i + m + 1];
+  { 
+    right_subarray[i] = arr[i + m + 1]; 
   }
 
-  k = l;
+  k = l; 
   i = 0;
-  j = 0;
-
-  while (i < lsize && j < rsize) {
+  j = 0; 
+ 
+  while (i < lsize && j < rsize) { 
     if (left_subarray[i] <= right_subarray[j])
-    {
+    { 
         arr[k] = left_subarray[i];
-        i++;
+        i++; 
     }
     else
     {
         arr[k] = right_subarray[j];
         j++;
     }
-    k++;
-  }
+    k++; 
+  } 
 
-  while (i < lsize) {
+  while (i < lsize) { 
     arr[k] = left_subarray[i];
     i++;
-    k++;
-  }
+    k++; 
+  } 
 
-  while (j < rsize) {
+  while (j < rsize) { 
     arr[k] = right_subarray[j];
     j++;
     k++;
-  }
-
+  } 
+	
   free(left_subarray);
   free(right_subarray);
-}
-
-
-void merge_sort(int l, int r)
-{
+} 
+  
+ 
+void merge_sort(int l, int r) 
+{  
 
   // printf("Inside merge sort \n");
-  int m = l + ((r - l) / 2);
-  if (l < r) {
-    merge_sort(l, m);
-    merge_sort(m + 1, r);
-    merge(l, m, r);
-  }
-}
-
-void* merge_sort_parallel(void* arg)
-{
+  int m = l + ((r - l) / 2); 
+  if (l < r) { 
+    merge_sort(l, m); 
+    merge_sort(m + 1, r); 
+    merge(l, m, r); 
+  } 
+} 
+   
+void* merge_sort_parallel(void* arg) 
+{ 
   printf("Inside Merge parallel \n");
 
   struct tsk *tsk = (struct tsk *)arg;
@@ -114,29 +114,29 @@ void* merge_sort_parallel(void* arg)
   // unsigned long thread_part = (unsigned long) arg;
 
   // int thread_part = part;
-  // part++;
+  // part++; 
 
-  // int l = thread_part * (n / THREAD_COUNT);
-  // int r = (thread_part + 1) * (n / THREAD_COUNT) - 1;
+  // int l = thread_part * (n / THREAD_COUNT); 
+  // int r = (thread_part + 1) * (n / THREAD_COUNT) - 1; 
 
-  int m = l + (r - l) / 2;
-  if (l < r) {
-    merge_sort(l, m);
-    merge_sort(m + 1, r);
-    merge(l, m, r);
-  }
-}
-
+  int m = l + (r - l) / 2; 
+  if (l < r) { 
+    merge_sort(l, m); 
+    merge_sort(m + 1, r); 
+    merge(l, m, r); 
+  } 
+} 
+  
 
 int pthread_sort(int num_of_elements, float *data)
-{
+{ 
 
   printf("Inside pthread \n");
 
   struct tsk *tsk;
 
   arr = data;
-  // int mem_size = num_of_elements * sizeof(float);
+  // int mem_size = num_of_elements * sizeof(float); 
   // arr = (float *)malloc(mem_size);
 
   // for(int i = 0; i < num_of_elements; i++){
@@ -152,7 +152,7 @@ int pthread_sort(int num_of_elements, float *data)
   struct tsk tsklist[THREAD_COUNT];
 
   int len = n / THREAD_COUNT;
-
+  
   printf("THREADS:%d MAX:%d LEN:%d\n", THREAD_COUNT, n, len);
 
   int low = 0;
@@ -161,7 +161,7 @@ int pthread_sort(int num_of_elements, float *data)
     tsk = &tsklist[i];
     tsk->tsk_no = i;
 
-
+    
     tsk->tsk_low = low;
     tsk->tsk_high = low + len - 1;
     if (i == (THREAD_COUNT - 1))
@@ -182,7 +182,7 @@ int pthread_sort(int num_of_elements, float *data)
     pthread_join(threads[i], NULL);
 
   // show the array values for each thread
-
+  
   // for (int i = 0; i < THREAD_COUNT; i++) {
   //     tsk = &tsklist[i];
   //     printf("SUB %d:", tsk->tsk_no);
@@ -192,7 +192,7 @@ int pthread_sort(int num_of_elements, float *data)
   // }
 
   // merging the final 4 parts
-
+  
   struct tsk *tskm = &tsklist[0];
   for (int i = 1; i < THREAD_COUNT; i++) {
     struct tsk *tsk = &tsklist[i];
@@ -209,20 +209,20 @@ int pthread_sort(int num_of_elements, float *data)
   // rc = pthread_create(&p1, NULL, mythread, "A"); assert(rc == 0);
   // rc = pthread_create(&p2, NULL, mythread, "B"); assert(rc == 0);
 
-  // pthread_t threads[THREAD_COUNT];
-
+  // pthread_t threads[THREAD_COUNT]; 
+ 
   // for (int i = 0; i < THREAD_COUNT; i++)
-  // {
-  //   pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i);
+  // { 
+  //   pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i); 
   // }
 
   // for (int i = 0; i < THREAD_COUNT; i++)
   // {
   //   pthread_join(threads[i], NULL);
-  // }
-
-  // merge(0, (n / 2 - 1) / 2, n / 2 - 1);
-  // merge(n / 2, n/2 + (n-1-n/2)/2, n - 1);
+  // } 
+   
+  // merge(0, (n / 2 - 1) / 2, n / 2 - 1); 
+  // merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
   // merge(0, (n - 1)/2, n - 1);
 
 
@@ -230,8 +230,9 @@ int pthread_sort(int num_of_elements, float *data)
 
   // for(int i = 0; i < n; i++){
   //   data[i] = arr[i];
-  // }
+  // } 
 
-  return 0;
+  return 0; 
 
 }
+
