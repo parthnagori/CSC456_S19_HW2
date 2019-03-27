@@ -18,6 +18,13 @@
 float *arr;
 int n; 
 int part = 0;
+
+struct tsk {
+    int tsk_no;
+    int tsk_low;
+    int tsk_high;
+};
+
   
 void merge(int l, int m, int r) 
 {   
@@ -88,13 +95,22 @@ void* merge_sort_parallel(void* arg)
 { 
   printf("Inside Merge parallel \n");
 
-  unsigned long thread_part = (unsigned long) arg;
+  struct tsk *tsk = arg;
+  int l;
+  int r;
+
+  // calculating low and high
+  l = tsk->tsk_low;
+  r = tsk->tsk_high;
+
+
+  // unsigned long thread_part = (unsigned long) arg;
 
   // int thread_part = part;
   // part++; 
 
-  int l = thread_part * (n / THREAD_COUNT); 
-  int r = (thread_part + 1) * (n / THREAD_COUNT) - 1; 
+  // int l = thread_part * (n / THREAD_COUNT); 
+  // int r = (thread_part + 1) * (n / THREAD_COUNT) - 1; 
 
   int m = l + (r - l) / 2; 
   if (l < r) { 
@@ -122,27 +138,85 @@ int pthread_sort(int num_of_elements, float *data)
 
   n = num_of_elements;
 
+
+
+  struct tsk tsklist[THREAD_MAX];
+
+  int len = n / THREAD_MAX;
+  
+  printf("THREADS:%d MAX:%d LEN:%d\n", THREAD_MAX, n, len);
+
+  int low = 0;
+
+  for (int i = 0; i < THREAD_MAX; i++, low += len) {
+    tsk = &tsklist[i];
+    tsk->tsk_no = i;
+
+    
+    tsk->tsk_low = low;
+    tsk->tsk_high = low + len - 1;
+    if (i == (THREAD_MAX - 1))
+      tsk->tsk_high = MAX - 1;
+
+
+    printf("RANGE %d: %d %d\n", i, tsk->tsk_low, tsk->tsk_high);
+  }
+
+  // creating 2 threads
+  for (int i = 0; i < THREAD_MAX; i++) {
+    tsk = &tsklist[i];
+    pthread_create(&threads[i], NULL, merge_sort_parallel, tsk);
+  }
+
+  // joining all 2 threads
+  for (int i = 0; i < THREAD_MAX; i++)
+    pthread_join(threads[i], NULL);
+
+  // show the array values for each thread
+  
+  // for (int i = 0; i < THREAD_MAX; i++) {
+  //     tsk = &tsklist[i];
+  //     printf("SUB %d:", tsk->tsk_no);
+  //     for (int j = tsk->tsk_low; j <= tsk->tsk_high; ++j)
+  //         printf(" %d", a[j]);
+  //     printf("\n");
+  // }
+
+  // merging the final 4 parts
+  
+  struct tsk *tskm = &tsklist[0];
+  for (int i = 1; i < THREAD_MAX; i++) {
+    struct tsk *tsk = &tsklist[i];
+    merge(tskm->tsk_low, tsk->tsk_low - 1, tsk->tsk_high);
+  }
+
+
+
+
   // pthread_t p1, p2;
   // int rc;
   // printf("main: begin\n");
   // rc = pthread_create(&p1, NULL, mythread, "A"); assert(rc == 0);
   // rc = pthread_create(&p2, NULL, mythread, "B"); assert(rc == 0);
 
-  pthread_t threads[THREAD_COUNT]; 
+  // pthread_t threads[THREAD_COUNT]; 
  
-  for (int i = 0; i < THREAD_COUNT; i++)
-  { 
-    pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i); 
-  }
+  // for (int i = 0; i < THREAD_COUNT; i++)
+  // { 
+  //   pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i); 
+  // }
 
-  for (int i = 0; i < THREAD_COUNT; i++)
-  {
-    pthread_join(threads[i], NULL);
-  } 
+  // for (int i = 0; i < THREAD_COUNT; i++)
+  // {
+  //   pthread_join(threads[i], NULL);
+  // } 
    
-  merge(0, (n / 2 - 1) / 2, n / 2 - 1); 
-  merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
-  merge(0, (n - 1)/2, n - 1);
+  // merge(0, (n / 2 - 1) / 2, n / 2 - 1); 
+  // merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
+  // merge(0, (n - 1)/2, n - 1);
+
+
+
 
   // for(int i = 0; i < n; i++){
   //   data[i] = arr[i];
