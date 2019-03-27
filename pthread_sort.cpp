@@ -21,8 +21,8 @@ int n;
 int part = 0;
 
 struct partition {
-    int partition_l;
-    int partition_r;
+    int l;
+    int r;
 };
 
 
@@ -104,8 +104,8 @@ void* merge_sort_parallel(void* arg)
   int l;
   int r;
 
-  l = partition->partition_l;
-  r = partition->partition_r;
+  l = partition->l;
+  r = partition->r;
 
 
   int m = l + (r - l) / 2;
@@ -124,9 +124,9 @@ int pthread_sort(int num_of_elements, float *data)
   arr = data;
   n = num_of_elements;
 
-  struct partition *partition;
-  struct partition *partition1;
-  struct partition *partition2;
+  // struct partition *partition;
+  struct partition* partition1 = (struct partition*) malloc(sizeof(struct partition));
+  struct partition* partition2 = (struct partition*) malloc(sizeof(struct partition));
 
   pthread_t p1, p2;
 
@@ -138,25 +138,25 @@ int pthread_sort(int num_of_elements, float *data)
   int l = 0;
 
   // Generating partition values for partitions to be run on both the threads
-  partition1->partition_l = l;
-  partition1->partition_r = l + parition_length - 1;
+  partition1->l = l;
+  partition1->r = l + parition_length - 1;
 
-  partition2->partition_l = l + parition_length;
-  partition2->partition_r = n - 1;
+  partition2->l = l + parition_length;
+  partition2->r = n - 1;
    
 
   
   int rc;
   printf("main: begin\n");
-  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) &partition1); assert(rc == 0);
-  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) &partition2); assert(rc == 0);
+  rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) partition1); assert(rc == 0);
+  rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) partition2); assert(rc == 0);
 
   
   pthread_join(p1, NULL);
   pthread_join(p2, NULL);
 
 
-  merge(partition1->partition_l, partition2->partition_l - 1, partition2->partition_r);
+  merge(partition1->l, partition2->l - 1, partition2->r);
 
 
   return 0;
