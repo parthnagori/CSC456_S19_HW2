@@ -22,7 +22,7 @@ int part = 0;
 void merge(int l, int m, int r) 
 {   
   printf("Inside Merge \n");
-  
+
   int lsize = m - l + 1;
   int rsize = r - m;
   int i, j, k;
@@ -88,8 +88,10 @@ void* merge_sort_parallel(void* arg)
 { 
   printf("Inside Merge parallel \n");
 
-  int thread_part = part;
-  part++; 
+  unsigned long thread_part = (unsigned long) arg;
+
+  // int thread_part = part;
+  // part++; 
 
   int l = thread_part * (n / THREAD_COUNT); 
   int r = (thread_part + 1) * (n / THREAD_COUNT) - 1; 
@@ -130,7 +132,7 @@ int pthread_sort(int num_of_elements, float *data)
  
   for (int i = 0; i < THREAD_COUNT; i++)
   { 
-    pthread_create(&threads[i], NULL, merge_sort_parallel, (void*)NULL); 
+    pthread_create(&threads[i], NULL, merge_sort_parallel, (void*) i); 
   }
 
   for (int i = 0; i < THREAD_COUNT; i++)
