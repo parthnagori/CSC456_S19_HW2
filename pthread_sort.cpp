@@ -28,14 +28,17 @@ struct tsk {
   
 void merge(int l, int m, int r) 
 {   
-  printf("Inside Merge \n");
+  printf("Inside Merge Range: %d %d %d\n", l, m, r);
 
   int lsize = m - l + 1;
   int rsize = r - m;
   int i, j, k;
 
-  float *left_subarray = new float[n/2];
-  float *right_subarray = new float[n/2];
+  float *left_subarray = malloc(lsize * sizeof(float));
+  float *right_subarray = malloc(rsize * sizeof(float));
+
+  // float *left_subarray = new float[n/2];
+  // float *right_subarray = new float[n/2];
 
   for (i = 0; i < lsize; i++)
   {
@@ -76,6 +79,10 @@ void merge(int l, int m, int r)
     j++;
     k++;
   } 
+
+  free(left_subarray);
+  free(right_subarray);
+
 } 
   
  
@@ -95,7 +102,8 @@ void* merge_sort_parallel(void* arg)
 { 
   printf("Inside Merge parallel \n");
 
-  struct tsk *tsk = arg;
+
+  struct tsk *tsk = (struct tsk *)arg;
   int l;
   int r;
 
@@ -129,6 +137,8 @@ int pthread_sort(int num_of_elements, float *data)
   struct tsk *tsk;
 
   arr = data;
+
+  n = num_of_elements;
   // int mem_size = num_of_elements * sizeof(float); 
   // arr = (float *)malloc(mem_size);
 
@@ -137,9 +147,6 @@ int pthread_sort(int num_of_elements, float *data)
   // }
 
   printf("Data copied \n");
-
-  n = num_of_elements;
-
 
   pthread_t threads[THREAD_COUNT];
   struct tsk tsklist[THREAD_COUNT];
@@ -189,6 +196,7 @@ int pthread_sort(int num_of_elements, float *data)
   struct tsk *tskm = &tsklist[0];
   for (int i = 1; i < THREAD_COUNT; i++) {
     struct tsk *tsk = &tsklist[i];
+    printf("Final Merge RANGE %d: %d %d %d\n", i, tskm->tsk_low, tsk->tsk_low - 1,  tsk->tsk_high);
     merge(tskm->tsk_low, tsk->tsk_low - 1, tsk->tsk_high);
   }
 
