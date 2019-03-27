@@ -13,7 +13,7 @@
 #include "mysort.h"
 
 
-#define THREAD_COUNT 4
+#define THREAD_COUNT 2
 
 float *arr;
 int n; 
@@ -108,7 +108,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   int mem_size = num_of_elements * sizeof(float); 
   arr = (float *)malloc(mem_size);
-  
+
   for(int i = 0; i < num_of_elements; i++){
     arr[i] = data[i];
   }
