@@ -141,7 +141,7 @@ int pthread_sort(int num_of_elements, float *data)
   n = num_of_elements;
 
 
-  pthread_t threads[THREAD_MAX];
+  pthread_t threads[THREAD_COUNT];
   struct tsk tsklist[THREAD_COUNT];
 
   int len = n / THREAD_COUNT;
@@ -158,7 +158,7 @@ int pthread_sort(int num_of_elements, float *data)
     tsk->tsk_low = low;
     tsk->tsk_high = low + len - 1;
     if (i == (THREAD_COUNT - 1))
-      tsk->tsk_high = MAX - 1;
+      tsk->tsk_high = n - 1;
 
 
     printf("RANGE %d: %d %d\n", i, tsk->tsk_low, tsk->tsk_high);
