@@ -23,10 +23,12 @@ int part = 0;
 struct partition {
     int l;
     int r;
+    float *left;
+    float *right;
 };
 
 
-void merge(int l, int m, int r)
+void merge(int l, int m, int r, float* left, float* right)
 {
   //printf("Inside Merge Range: %d %d %d\n", l, m, r);
   //printf("Inside Merge \n");
@@ -35,9 +37,11 @@ void merge(int l, int m, int r)
   int rsize = r - m;
   int i, j, k;
 
-  float *left_subarray = (float *)malloc(lsize * sizeof(float));
-  float *right_subarray = (float *)malloc(rsize * sizeof(float));
+  // float *left_subarray = (float *)malloc(lsize * sizeof(float));
+  // float *right_subarray = (float *)malloc(rsize * sizeof(float));
 
+  float *left_subarray = left
+  float *right_subarray = right
 
   for (i = 0; i < lsize; i++)
   {
@@ -79,20 +83,20 @@ void merge(int l, int m, int r)
     k++;
   }
 
-  free(left_subarray);
-  free(right_subarray);
+  // free(left_subarray);
+  // free(right_subarray);
 }
 
 
-void merge_sort(int l, int r)
+void merge_sort(int l, int r, float* left, float* right)
 {
 
   // printf("Inside merge sort \n");
   int m = l + ((r - l) / 2);
   if (l < r) {
-    merge_sort(l, m);
-    merge_sort(m + 1, r);
-    merge(l, m, r);
+    merge_sort(l, m, left, right);
+    merge_sort(m + 1, r, left, right);
+    merge(l, m, r, left, right);
   }
 }
 
@@ -110,9 +114,9 @@ void* merge_sort_parallel(void* arg)
 
   int m = l + (r - l) / 2;
   if (l < r) {
-    merge_sort(l, m);
-    merge_sort(m + 1, r);
-    merge(l, m, r);
+    merge_sort(l, m, partition->left, partition->right);
+    merge_sort(m + 1, r, partition->left, partition->right);
+    merge(l, m, r, partition->left, partition->right);
   }
 }
 
@@ -130,20 +134,27 @@ int pthread_sort(int num_of_elements, float *data)
 
   pthread_t p1, p2;
 
-  int parition_length = n / THREAD_COUNT;
+  int partition_length = n / THREAD_COUNT;
 
-  // printf("THREADS:%d MAX:%d parition_length:%d\n", THREAD_COUNT, n, parition_length);
+  // printf("THREADS:%d MAX:%d partition_length:%d\n", THREAD_COUNT, n, partition_length);
 
   
   int l = 0;
 
   // Generating partition values for partitions to be run on both the threads
   partition1->l = l;
-  partition1->r = l + parition_length - 1;
+  partition1->r = l + partition_length - 1;
 
-  partition2->l = l + parition_length;
+  partition2->l = l + partition_length;
   partition2->r = n - 1;
-   
+
+
+  partition1->left = (float *)malloc(partition_length * sizeof(float));
+  partition1->right = (float *)malloc(partition_length * sizeof(float)); 
+
+  partition2->left = (float *)malloc(partition_length * sizeof(float));
+  partition2->right = (float *)malloc(partition_length * sizeof(float));   
+
 
   
   int rc;
@@ -158,8 +169,8 @@ int pthread_sort(int num_of_elements, float *data)
 
   merge(partition1->l, partition2->l - 1, partition2->r);
 
-  free(partition1);
-  free(partition2);
+  // free(partition1);
+  // free(partition2);
 
   return 0;
 
