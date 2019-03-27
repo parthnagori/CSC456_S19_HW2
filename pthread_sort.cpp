@@ -10,7 +10,6 @@
 #include <float.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <assert.h>
 #include "mysort.h"
 
 
@@ -20,9 +19,10 @@ float *arr;
 int n;
 int part = 0;
 
-struct partition {
-    int partition_l;
-    int partition_r;
+struct tsk {
+    int tsk_no;
+    int tsk_low;
+    int tsk_high;
 };
 
 
@@ -38,6 +38,8 @@ void merge(int l, int m, int r)
   float *left_subarray = (float *)malloc(lsize * sizeof(float));
   float *right_subarray = (float *)malloc(rsize * sizeof(float));
 
+  //float *left_subarray = new float[n/2];
+  //float *right_subarray = new float[n/2];
 
   for (i = 0; i < lsize; i++)
   {
@@ -100,13 +102,22 @@ void* merge_sort_parallel(void* arg)
 {
   printf("Inside Merge parallel \n");
 
-  struct partition *partition = (struct partition *)arg;
+  struct tsk *tsk = (struct tsk *)arg;
   int l;
   int r;
 
-  l = partition->partition_l;
-  r = partition->partition_r;
+  // calculating low and high
+  l = tsk->tsk_low;
+  r = tsk->tsk_high;
 
+
+  // unsigned long thread_part = (unsigned long) arg;
+
+  // int thread_part = part;
+  // part++;
+
+  // int l = thread_part * (n / THREAD_COUNT);
+  // int r = (thread_part + 1) * (n / THREAD_COUNT) - 1;
 
   int m = l + (r - l) / 2;
   if (l < r) {
@@ -122,7 +133,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   printf("Inside pthread \n");
 
-  struct partition *partition;
+  struct tsk *tsk;
 
   arr = data;
   // int mem_size = num_of_elements * sizeof(float);
@@ -138,7 +149,7 @@ int pthread_sort(int num_of_elements, float *data)
 
 
   pthread_t threads[THREAD_COUNT];
-  struct partition partitions[THREAD_COUNT];
+  struct tsk tsklist[THREAD_COUNT];
 
   int len = n / THREAD_COUNT;
 
@@ -146,23 +157,24 @@ int pthread_sort(int num_of_elements, float *data)
 
   int low = 0;
 
-
   for (int i = 0; i < THREAD_COUNT; i++, low += len) {
-    partition = &partitions[i];
+    tsk = &tsklist[i];
+    tsk->tsk_no = i;
 
-    partition->partition_l = low;
-    partition->partition_r = low + len - 1;
+
+    tsk->tsk_low = low;
+    tsk->tsk_high = low + len - 1;
     if (i == (THREAD_COUNT - 1))
-      partition->partition_r = n - 1;
+      tsk->tsk_high = n - 1;
 
 
-    printf("RANGE %d: %d %d\n", i, partition->partition_l, partition->partition_r);
+    printf("RANGE %d: %d %d\n", i, tsk->tsk_low, tsk->tsk_high);
   }
 
   // creating 2 threads
   for (int i = 0; i < THREAD_COUNT; i++) {
-    partition = &partitions[i];
-    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
+    tsk = &tsklist[i];
+    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) tsk);
   }
 
   // joining all 2 threads
@@ -172,20 +184,20 @@ int pthread_sort(int num_of_elements, float *data)
   // show the array values for each thread
 
   // for (int i = 0; i < THREAD_COUNT; i++) {
-  //     partition = &partitions[i];
-  //     printf("SUB %d:", partition->partition_no);
-  //     for (int j = partition->partition_l; j <= partition->partition_r; ++j)
+  //     tsk = &tsklist[i];
+  //     printf("SUB %d:", tsk->tsk_no);
+  //     for (int j = tsk->tsk_low; j <= tsk->tsk_high; ++j)
   //         printf(" %d", a[j]);
   //     printf("\n");
   // }
 
   // merging the final 4 parts
 
-  struct partition *partitionm = &partitions[0];
+  struct tsk *tskm = &tsklist[0];
   for (int i = 1; i < THREAD_COUNT; i++) {
-    struct partition *partition = &partitions[i];
-    printf("Final Merge RANGE %d: %d %d %d\n", i, partitionm->partition_l, partition->partition_l - 1,  partition->partition_r);
-    merge(partitionm->partition_l, partition->partition_l - 1, partition->partition_r);
+    struct tsk *tsk = &tsklist[i];
+    printf("Final Merge RANGE %d: %d %d %d\n", i, tskm->tsk_low, tsk->tsk_low - 1,  tsk->tsk_high);
+    merge(tskm->tsk_low, tsk->tsk_low - 1, tsk->tsk_high);
   }
 
 
