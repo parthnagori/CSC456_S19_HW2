@@ -137,7 +137,11 @@ int pthread_sort(int num_of_elements, float *data)
    
   merge(0, (n / 2 - 1) / 2, n / 2 - 1); 
   merge(n / 2, n/2 + (n-1-n/2)/2, n - 1); 
-  merge(0, (n - 1)/2, n - 1); 
+  merge(0, (n - 1)/2, n - 1);
+
+  for(int i = 0; i < n; i++){
+    data[i] = arr[i];
+  } 
 
   return 0; 
 
