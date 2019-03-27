@@ -34,8 +34,8 @@ void merge(int l, int m, int r)
   int rsize = r - m;
   int i, j, k;
 
-  float *left_subarray = malloc(lsize * sizeof(float));
-  float *right_subarray = malloc(rsize * sizeof(float));
+  float *left_subarray = (float *)malloc(lsize * sizeof(float));
+  float *right_subarray = (float *)malloc(rsize * sizeof(float));
 
   // float *left_subarray = new float[n/2];
   // float *right_subarray = new float[n/2];
