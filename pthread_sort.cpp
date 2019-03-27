@@ -40,8 +40,8 @@ void merge(int l, int m, int r, float* left, float* right)
   // float *left_subarray = (float *)malloc(lsize * sizeof(float));
   // float *right_subarray = (float *)malloc(rsize * sizeof(float));
 
-  float *left_subarray = left
-  float *right_subarray = right
+  float *left_subarray = left;
+  float *right_subarray = right;
 
   for (i = 0; i < lsize; i++)
   {
@@ -167,7 +167,7 @@ int pthread_sort(int num_of_elements, float *data)
   pthread_join(p2, NULL);
 
 
-  merge(partition1->l, partition2->l - 1, partition2->r);
+  merge(partition1->l, partition2->l - 1, partition2->r, partition1->left, partition1->right);
 
   // free(partition1);
   // free(partition2);
