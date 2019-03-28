@@ -123,24 +123,30 @@ int pthread_sort(int num_of_elements, float *data)
   pthread_t threads[THREAD_COUNT];
   struct partition partitions[THREAD_COUNT];
 
+  struct partition *partition;
+
   int partition_length = n / THREAD_COUNT;
 
   for (int i = 0, l = 0; i < THREAD_COUNT; i++, l += partition_length) {
-    partitions[i]->l = l;
-    partitions[i]->r = l + partition_length - 1;
+    partition = &partitions[i];
+    partition->l = l;
+    partition->r = l + partition_length - 1;
     if (i == (THREAD_COUNT - 1))
-      partitions[i]->r = n - 1;
+      partition->r = n - 1;
   }
 
   for (int i = 0; i < THREAD_COUNT; i++)
-    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partitions[i]);
+    partition = &partitions[i];
+    pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
 
   for (int i = 0; i < THREAD_COUNT; i++)
     pthread_join(threads[i], NULL);
 
 
+  struct partition *first_partition = &partitions[0];
   for (int i = 1; i < THREAD_COUNT; i++)
-    merge(partitions[0]->l, partitions[i]->l - 1, partitions[i]->r);
+    partition = &partitions[i];
+    merge(first_partition->l, partition->l - 1, partition->r);
 
   free(temp);
   // struct partition* partition1 = (struct partition*) malloc(sizeof(struct partition));
