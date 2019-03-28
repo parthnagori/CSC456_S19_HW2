@@ -28,7 +28,7 @@ struct partition {
 };
 
 // Merge operation
-void merge(int l, int m, int r, float* left, float* right)
+void merge(int l, int m, int r)
 {
   int lsize = m - l + 1;
   int rsize = r - m;
