@@ -123,11 +123,11 @@ int pthread_sort(int num_of_elements, float *data)
   pthread_t threads[THREAD_COUNT];
   struct partition partitions[THREAD_COUNT];
 
-  struct partition *partition;
 
   int partition_length = n / THREAD_COUNT;
 
   for (int i = 0, l = 0; i < THREAD_COUNT; i++, l += partition_length) {
+    struct partition *partition;
     partition = &partitions[i];
     partition->l = l;
     partition->r = l + partition_length - 1;
@@ -136,6 +136,7 @@ int pthread_sort(int num_of_elements, float *data)
   }
 
   for (int i = 0; i < THREAD_COUNT; i++)
+    struct partition *partition;
     partition = &partitions[i];
     pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
 
@@ -145,6 +146,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   struct partition *first_partition = &partitions[0];
   for (int i = 1; i < THREAD_COUNT; i++)
+    struct partition *partition;
     partition = &partitions[i];
     merge(first_partition->l, partition->l - 1, partition->r);
 
