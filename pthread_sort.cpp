@@ -125,7 +125,7 @@ int pthread_sort(int num_of_elements, float *data)
 
   int partition_length = n / THREAD_COUNT;
 
-  for (int i = 0, int l = 0; i < THREAD_COUNT; i++, l += partition_length) {
+  for (int i = 0, l = 0; i < THREAD_COUNT; i++, l += partition_length) {
     partitions[i]->l = l;
     partitions[i]->r = l + partition_length - 1;
     if (i == (THREAD_COUNT - 1))
