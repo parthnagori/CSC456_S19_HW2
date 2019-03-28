@@ -1,5 +1,5 @@
-  // CSC456: Name --
-  // CSC456: Student ID # --
+  // CSC456: Name -- Parth Nagori
+  // CSC456: Student ID # -- 200208747
   // CSC456: I am implementing -- {What parallel sorting algorithm using pthread}
   // CSC456: Feel free to modify any of the following. You can only turnin this file.
 
@@ -83,7 +83,6 @@ void merge(int l, int m, int r, float* left, float* right)
 // Recursive Merge Sort
 void merge_sort(int l, int r, float* left, float* right)
 {
-
   int m = l + ((r - l) / 2);
   if (l < r) {
     merge_sort(l, m, left, right);
@@ -96,21 +95,14 @@ void merge_sort(int l, int r, float* left, float* right)
 void* merge_sort_parallel(void* arg)
 {
   struct partition *partition = (struct partition *)arg;
-  int l;
-  int r;
 
-  l = partition->l;
-  r = partition->r;
-
-
-  int m = l + (r - l) / 2;
-  if (l < r) {
-    merge_sort(l, m, partition->left, partition->right);
-    merge_sort(m + 1, r, partition->left, partition->right);
-    merge(l, m, r, partition->left, partition->right);
+  int m = partition->l + (partition->r - partition->l) / 2;
+  if (partition->l < partition->r) {
+    merge_sort(partition->l, m, partition->left, partition->right);
+    merge_sort(m + 1, partition->r, partition->left, partition->right);
+    merge(partition->l, m, partition->r, partition->left, partition->right);
   }
 }
-
 
 int pthread_sort(int num_of_elements, float *data)
 {
@@ -128,29 +120,24 @@ int pthread_sort(int num_of_elements, float *data)
   int l = 0;
 
   // Generating partition values for partitions to be run on both the threads
+  // Allocating a common memory location for each thread
   partition1->l = l;
   partition1->r = l + partition_length - 1;
-
-  partition2->l = l + partition_length;
-  partition2->r = n - 1;
-
-  // Allocating a common memory location for each thread
   partition1->left = (float *)malloc(partition_length * sizeof(float));
   partition1->right = (float *)malloc(partition_length * sizeof(float)); 
 
+  partition2->l = l + partition_length;
+  partition2->r = n - 1;
   partition2->left = (float *)malloc(partition_length * sizeof(float));
-  partition2->right = (float *)malloc(partition_length * sizeof(float));   
-
+  partition2->right = (float *)malloc(partition_length * sizeof(float));
 
   
   int rc;
   rc = pthread_create(&p1, NULL, merge_sort_parallel, (void *) partition1); assert(rc == 0);
   rc = pthread_create(&p2, NULL, merge_sort_parallel, (void *) partition2); assert(rc == 0);
 
-  
   pthread_join(p1, NULL);
   pthread_join(p2, NULL);
-
 
   merge(partition1->l, partition2->l - 1, partition2->r, partition1->left, partition1->right);
 
