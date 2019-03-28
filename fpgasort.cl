@@ -4,6 +4,6 @@ __kernel void fpgasort(__global const float *x,
 {
     // get index of the work item
     int index = get_global_id(0);
-
+    printf("Work Item Index : %d\n", index);
 }
 
