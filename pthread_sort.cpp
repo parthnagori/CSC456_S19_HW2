@@ -134,19 +134,20 @@ int pthread_sort(int num_of_elements, float *data)
       partition->r = n - 1;
   }
 
-  for (int i = 0; i < THREAD_COUNT; i++)
+  for (int i = 0; i < THREAD_COUNT; i++){
     struct partition *partition = &partitions[i];
     pthread_create(&threads[i], NULL, merge_sort_parallel, (void *) partition);
+  }
 
   for (int i = 0; i < THREAD_COUNT; i++)
     pthread_join(threads[i], NULL);
 
 
   struct partition *first_partition = &partitions[0];
-  for (int i = 1; i < THREAD_COUNT; i++)
+  for (int i = 1; i < THREAD_COUNT; i++){
     struct partition *partition = &partitions[i];
     merge(first_partition->l, partition->l - 1, partition->r);
-
+  }
   free(temp);
   // struct partition* partition1 = (struct partition*) malloc(sizeof(struct partition));
   // struct partition* partition2 = (struct partition*) malloc(sizeof(struct partition));
